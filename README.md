@@ -49,7 +49,7 @@ The models can be seen in [models.py](myproject/myapp/models.py) file and was ma
 - recurrence_pattern: indicates if this particular pattern can reoccur, such as "weekly", "bi-weekly", etc. This field is kept for further developing the project in case calendar scheduling gets involved
 
 ## 2. API
-There are 3 APIs as per the project requirements and a 4th extra helper API.
+There are 3 APIs as per the project requirements and a 4th extra helper API. The view definitions can be seen in the [views.py](myproject/api/views.py) file and the url path definitions can be seen in [urls.py](myproject/api/urls.py) file.
 1. Get doctor by ID: `http://localhost:8000/doctor/:id`
    - Returns the doctor, and all related info, associated with the id given as a query parameter.
    - An example url would be `http://localhost:8000/doctor/38933b58-57d2-41da-987b-836fe160eaca` as the id is in the form of UUID 4
