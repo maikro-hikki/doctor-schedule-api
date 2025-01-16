@@ -154,16 +154,19 @@ If only tests from one of the test files needs to be run, then go to the [root d
 
 ## 4. README questions
 1. Choice of Framework & Library
-   - I have chosen to use Django framework along with the Django REST framework to develop the backend. The main assumptions for these choices is for quick and efficient development (due to the 8 hour deadline) and being able to expand and scale the project even further in the future.
+   - I have chosen to use Django framework with SQLite database along with the Django REST framework to develop the backend. The main assumptions for these choices is for quick and efficient development (due to the 8 hour deadline) and being able to expand and scale the project even further in the future.
    - The benefits of them are as such:
      - Django allows developers to build applications quickly due to all the built-in features included, such as Object Relational Mapping (ORM), admin panel, etc., and it is also very scalable. It also has a large and active community with a lot of documentation and packages available for developers to use. All of this allows for fast and efficient development, which is really useful to handle the 8 hour time limit of this assignment.
+     - SQLite database doesn't need any configuration and is extremely lightweight. It is also very fast and efficient when running queries compared to other databases due to being serverless.
      - Django REST framework provides serialization with can be used to validate and convert data to python data types efficiently which further speeds up development. There are also a lot of other features, such as mechanisms for authentication and API abuse.
    - The drawbacks are as such:
      - Due to all the built in features of Django, there could be a lot of overhead which could be unnecessary for small projects. The structure of Django is also restricted which makes developers less free to choose what they want and don't want to use.
+     - SQLite is limited when it comes to scalability as it can struggle with heavy database changes and have storage limitations, such as reduced performance, with large datasets. It also has limited support for concurrency and should only be used in scenarios with low to moderate concurrency requirements.
      - Django REST framework might also have a lot of overhead, especially for smaller projects, due to all the features it has.
 2. If I was given more time, I'd focus on improving the security of the project by adding more validations for requests, securing the APIs through authentication and throttling mechanisms, and adding more test cases. I'd also add a logging feature to easily monitor everything that happens in the project, including errors.
 3. Stuff to consider for deploying my app to a production environment:
    - Handle all the improvments I have mentioned in the second question.
+   - Change the database to a something more scalable, such as PostgreSQL, MySQL, etc.
    - Securing the application is a huge priority as deploying the software to production exposes it to attacks.
    - A lot more test cases should be added, potentially having 100% code coverage, or as close as possible to it.
    - Automating the build process should also be considered to make deployment as consistent and reliable as possible.
