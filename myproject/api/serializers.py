@@ -65,13 +65,14 @@ class CreateDoctorSerializer(serializers.Serializer):
         return value
 
 
+class HospitalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hospital
+        fields = "__all__"
+
+
 # class DoctorFilteredSerializer(serializers.Serializer):
 #     district = serializers.CharField(required=False)
 #     category = serializers.CharField(required=False)
 #     price = PriceRangeSerializer(required=False)
 #     language = serializers.CharField(required=False)
-
-# class HospitalSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Hospital
-#         fields = "__all__"

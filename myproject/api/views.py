@@ -8,6 +8,7 @@ from .serializers import (
     DoctorSerializer,
     AvailabilitySerializer,
     CreateDoctorSerializer,
+    HospitalSerializer,
 )
 from django.db.models import Q
 
@@ -130,6 +131,14 @@ def addDoctor(request):
     return Response(saved_doctor.id, status=201)
 
 
+@api_view(["POST"])
+def addHospital(request):
+    serializer = HospitalSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)
+
+
 # @api_view(["GET"])
 # def getHospitalList(request):
 #     hospitals = Hospital.objects.all()
@@ -153,12 +162,4 @@ def addDoctor(request):
 #         return Response(res, status=400)
 
 #     serializer = HospitalSerializer(hospital)
-#     return Response(serializer.data)
-
-
-# @api_view(["POST"])
-# def addHospital(request):
-#     serializer = HospitalSerializer(data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
 #     return Response(serializer.data)
