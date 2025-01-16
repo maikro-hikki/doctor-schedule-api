@@ -1,4 +1,6 @@
-_This is a quick summary of the project. More details about the project and demonstration can be done with a meeting._
+_This is a quick summary of the project along with the required deliverables. More details about the project and demonstration can be done with a meeting._
+
+_With the requirement of the project to be around 8 hours for development, the development aspect of the project was done over 2 days with around 4 hours of development on each day. The third day was used for documentation, such as making the README file._
 
 # Starting the Server
 The python version used during development is 3.12.3 on Windows 10.
@@ -11,7 +13,7 @@ The [.gitignore](.gitignore) file is simply used to ignore the sqlite database f
 
 To start the server, go into the [myproject](myproject/) directory and run the command `python manage.py runserver`. The available APIs will be discussed in the API section.
 
-To run the automatic tests, run `python manage.py test`.
+To run all the tests automatically, go to the [root directory](myproject/) and run `python manage.py test`.
 
 # Deliverables
 ## 1. Models
@@ -47,7 +49,7 @@ The models can be seen in [models.py](myproject/myapp/models.py) file and was ma
 - recurrence_pattern: indicates if this particular pattern can reoccur, such as "weekly", "bi-weekly", etc. This field is kept for further developing the project in case calendar scheduling gets involved
 
 ## 2. API
-There are 3 APIs as per the project requirements.
+There are 3 APIs as per the project requirements and a 4th extra helper API.
 1. Get doctor by ID: `http://localhost:8000/doctor/:id`
    - Returns the doctor, and all related info, associated with the id given as a query parameter.
    - An example url would be `http://localhost:8000/doctor/38933b58-57d2-41da-987b-836fe160eaca` as the id is in the form of UUID 4
@@ -98,7 +100,7 @@ There are 3 APIs as per the project requirements.
 3. Create a doctor: `http://localhost:8000/add-doctor`
    - Creates a doctor based on the given information in the request body.
    - The request body will include information about the doctor, available time slots, and hospital ID.
-   - To associate a doctor with a hospital, the hospital have to be registered into the database first, which can then be associated with the doctor using the hospital ID.
+   - To associate a doctor with a hospital, the hospital have to be registered into the database first, which can then be associated with the doctor using the hospital ID. A helper API for registering a hospital has been implemented to help with the demo as seen in point 4.
    - An example request body will look as such:
      ```python
      {
@@ -119,4 +121,59 @@ There are 3 APIs as per the project requirements.
           ]
       }
      ```
-   
+4. Create a hospital: `http://localhost:8000/add-hospital`
+   - This is just a quick helper API that can be used to register some hospitals in the database to be used for demonstration when associating doctors with hospitals.
+   - The API takes in the hospital information and returns the stored hospital object from the database.
+   - An example request and reponse body looks as such:
+     ```python
+     # Example request body
+     {
+          "name": "Some Hospital",
+          "phone_number": "12345678",
+          "address_line_1": "Room 1, 12/F, Some Tower, Some Street",
+          "district": "Some Disctrict",
+          "region": "Some Region"
+      }
+
+     # response body
+       {
+          "id": "0f2384f9-01d3-47fd-959b-9eabf228abcc",
+          "name": "Some Hospital",
+          "phone_number": "12345678",
+          "address_line_1": "Room 1, 12/F, Some Tower, Some Street",
+          "district": "Some Disctrict",
+          "region": "Some Region"
+      }
+     ```
+## 3. Testing
+All the tests for the project can be seen in the [tests_suite](myproject/myapp/tests_suite/) directory.
+
+To run all the tests automatically, go to the [root directory](myproject/) and run `python manage.py test`.
+
+If only tests from one of the test files needs to be run, then go to the [root directory](myproject/) and run the command `python manage.py test myapp.tests_suite.name_of_test_file`.
+
+## 4. README questions
+1. Choice of Framework & Library
+   - I have chosen to use Django framework along with the Django REST framework to develop the backend. The main assumptions for these choices is for quick and efficient development (due to the 8 hour deadline) and being able to expand and scale the project even further in the future.
+   - The benefits of them are as such:
+     - Django allows developers to build applications quickly due to all the built-in features included, such as Object Relational Mapping (ORM), admin panel, etc., and it is also very scalable. It also has a large and active community with a lot of documentation and packages available for developers to use. All of this allows for fast and efficient development, which is really useful to handle the 8 hour time limit of this assignment.
+     - Django REST framework provides serialization with can be used to validate and convert data to python data types efficiently which further speeds up development. There are also a lot of other features, such as mechanisms for authentication and API abuse.
+   - The drawbacks are as such:
+     - Due to all the built in features of Django, there could be a lot of overhead which could be unnecessary for small projects. The structure of Django is also restricted which makes developers less free to choose what they want and don't want to use.
+     - Django REST framework might also have a lot of overhead, especially for smaller projects, due to all the features it has.
+2. If I was given more time, I'd focus on improving the security of the project by adding more validations for requests, securing the APIs through authentication and throttling mechanisms, and adding more test cases. I'd also add a logging feature to easily monitor everything that happens in the project, including errors.
+3. Stuff to consider for deploying my app to a production environment:
+   - Handle all the improvments I have mentioned in the second question.
+   - Securing the application is a huge priority as deploying the software to production exposes it to attacks.
+   - A lot more test cases should be added, potentially having 100% code coverage, or as close as possible to it.
+   - Automating the build process should also be considered to make deployment as consistent and reliable as possible.
+   - The database schema should also be revisited for potential expansion of the project.
+   - Consider scalability of the project by thinking about load handling and traffic of the server.
+   - Documentation is also important to consider to allow for efficient development by developers.
+   - Having a backup methods for the data should also be considered to prevent data loss and security in unexpected situations.
+4. Assumptions and opinions I have made are as such:
+   - For doctors to be associated with any hospitals, the hospital must first be registered.
+   - A doctor can only be associated with one hospital but a hospital can be associated with many doctors.
+   - A doctor does not need to be associated with a hospital. (This is particularly done as there are more and more "virtual doctors" who does all their consulting through online means. It's just here in case "virtual doctors" are allowed to work with the company in the future)
+   - Each time period in the Availability table is associated to one doctor, but a doctor can be associated with many time periods. If the doctor is removed from the database, the related time periods will also be removed.
+   - The API responses to retrieve doctors currently contain all the information needed to fill out everything that is seen in the example UI in the requirements, which makes the body really large. I would cosider utilizing multiple APIs with smaller bodies depending on the situation to improve performance.
