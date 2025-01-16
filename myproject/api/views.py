@@ -1,9 +1,10 @@
+from decimal import Decimal
 import uuid
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from myapp.models import Hospital, Doctor, Availability
+from .utils import generate_detailed_doctor
+from myapp.models import Doctor
 from .serializers import (
-    HospitalSerializer,
     DoctorSerializer,
     AvailabilitySerializer,
     CreateDoctorSerializer,
@@ -12,7 +13,7 @@ from django.db.models import Q
 
 
 @api_view(["GET"])
-def getDoctor(request, id):
+def getDoctorWithId(request, id):
 
     try:
         uuid_obj = uuid.UUID(id)
@@ -26,26 +27,12 @@ def getDoctor(request, id):
         res = {"error": "doctor ID does not exist"}
         return Response(res, status=400)
 
-    availabilities = Availability.objects.filter(doctor=doctor)
+    complete_doctor = generate_detailed_doctor(doctor)
+    if complete_doctor is None:
+        res = {"error": "doctor ID does not exist"}
+        return Response(res, status=400)
 
-    complete_doctor_info = {
-        "id": doctor.id,
-        "first_name": doctor.first_name,
-        "last_name": doctor.last_name,
-        "phone_number": doctor.phone_number,
-        "hospital": HospitalSerializer(doctor.hospital).data,
-        "category": doctor.category,
-        "member_price": doctor.member_price,
-        "fee": doctor.fee,
-        "fee_notes": doctor.fee_notes,
-        "language1": doctor.language1,
-        "language2": doctor.language2,
-        "availability": AvailabilitySerializer(availabilities, many=True).data,
-    }
-
-    # serializer = DoctorSerializer(doctor)
-    # return Response(serializer.data)
-    return Response(complete_doctor_info)
+    return Response(complete_doctor)
 
 
 @api_view(["GET"])
@@ -57,30 +44,47 @@ def getDoctorFiltered(request):
     max_price = request.query_params.get("max_price")
     language = request.query_params.get("language")
 
-    doctors = Doctor.objects.select_related("hospital")
+    filters = Q()
 
     if district:
-        doctors = doctors.filter(hospital__district__icontains=district)
+        filters &= Q(hospital__district=district)
 
     if category:
-        doctors = doctors.filter(category__icontains=category)
+        filters &= Q(category=category)
 
     if min_price:
         if max_price:
-            if min_price > max_price:
+            try:
+                min_price_decimal = Decimal(min_price)
+                max_price_decimal = Decimal(max_price)
+            except ValueError:
+                res = {"error": "min_price and max_price must be decimal numbers"}
+                return Response(res, status=400)
+
+            if min_price_decimal > max_price_decimal:
                 res = {"error": "min_price must be less than or equal to max_price"}
                 return Response(res, status=400)
 
-            doctors = doctors.filter(fee__gte=min_price, fee__lte=max_price)
+            filters &= Q(fee__range=(min_price_decimal, max_price_decimal))
 
     if language:
-        doctors = doctors.filter(
-            Q(language1__icontains=language) | Q(language2__icontains=language)
+        language_filter = Q(language1__icontains=language) | Q(
+            language2__icontains=language
         )
+        filters &= language_filter
 
-    serializer = DoctorSerializer(doctors, many=True)
+    doctors = Doctor.objects.filter(filters)
 
-    return Response(serializer.data)
+    complete_doctors = []
+    for doctor in doctors:
+        complete_doctor = generate_detailed_doctor(doctor)
+        if complete_doctor is None:
+            res = {"error": "doctor ID does not exist"}
+            return Response(res, status=400)
+
+        complete_doctors.append(complete_doctor)
+
+    return Response(complete_doctors)
 
 
 @api_view(["POST"])

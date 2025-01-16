@@ -1,73 +1,117 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
-from django.utils import timezone
-from ..models import Hospital, Doctor, Availability
-
-# from api.serializers import (
-#     HospitalSerializer,
-#     DoctorSerializer,
-#     AvailabilitySerializer,
-#     CreateDoctorSerializer,
-# )
+from myapp.models import Hospital, Doctor, Availability
 
 
-class DoctorAPITestCase(APITestCase):
+class DoctorViewTestCase(APITestCase):
     def setUp(self):
         self.hospital = Hospital.objects.create(
-            name="Test hospital",
+            name="Test Hospital1",
             phone_number="12345678",
-            address_line_1="Test address",
-            district="Test district",
-            region="Test region",
+            address_line_1="123 Test Street1",
+            district="Test District1",
+            region="Test Region1",
+        )
+        self.hospital2 = Hospital.objects.create(
+            name="Test Hospital2",
+            phone_number="78901234",
+            address_line_1="123 Test Street2",
+            district="Test District2",
+            region="Test Region2",
         )
         self.doctor = Doctor.objects.create(
-            first_name="John",
-            last_name="Doe",
+            first_name="Test1",
+            last_name="Doctor1",
             phone_number="87654321",
             hospital=self.hospital,
-            category="Test category",
-            member_price=100.50,
-            fee=200.75,
-            fee_notes="Test fee notes",
+            category="General Practitioner",
+            fee=100.00,
             language1="en",
-            language2="es",
+        )
+        self.doctor2 = Doctor.objects.create(
+            first_name="Test2",
+            last_name="Doctor2",
+            phone_number="10293847",
+            hospital=self.hospital,
+            category="Cardiology",
+            fee=200.00,
+            language1="en",
+            language2="zn",
+        )
+        self.doctor3 = Doctor.objects.create(
+            first_name="Test3",
+            last_name="Doctor3",
+            phone_number="12345678",
+            hospital=self.hospital2,
+            category="General Practitioner",
+            fee=300.00,
+            language1="en",
+            language2="de",
         )
         self.availability = Availability.objects.create(
             doctor=self.doctor,
             day_of_week="Monday",
-            start_time=timezone.now().time(),
-            end_time=timezone.now().time(),
+            start_time="09:00:00",
+            end_time="17:00:00",
             recurrence_pattern="weekly",
         )
 
-    def test_get_doctor(self):
-        url = reverse("get_doctor", args=[str(self.doctor.id)])
+    def test_get_doctor_with_id(self):
+        url = reverse("get_doctor_with_id", args=[self.doctor.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data["first_name"], "Test1")
+        self.assertEqual(response.data["last_name"], "Doctor1")
+        self.assertEqual(response.data["hospital"]["name"], "Test Hospital1")
 
     def test_get_doctor_filtered(self):
         url = reverse("doctor")
-        response = self.client.get(url)
+        response = self.client.get(
+            url, {"district": "Test District1", "category": "Cardiology"}
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
 
     def test_add_doctor(self):
-        url = reverse("add_hospital")
-        data = {
-            "first_name": "Jane",
-            "last_name": "Smith",
-            "phone_number": "98765432",
+        url = reverse("add_doctor")
+        data1 = {
+            "first_name": "New",
+            "last_name": "Doctor",
+            "phone_number": "12345678",
             "hospital": self.hospital.id,
-            "category": "General Practitioner",
-            "member_price": 150.25,
-            "fee": 250.75,
-            "fee_notes": "Some fee notes",
-            "language1": "fr",
-            "language2": "de",
-            "availability": [
-                ["Tuesday", "09:00:00", "17:00:00", "weekly"],
-                ["Thursday", "10:00:00", "16:00:00", "bi-weekly"],
-            ],
+            "category": "New Category",
+            "member_price": "123.00",
+            "fee": "150.00",
+            "fee_notes": "Not inclusive Western medicine",
+            "language1": "zh",
+            "language2": "en",
+            "availability": [["Monday", "08:00:00", "16:00:00", "weekly"]],
         }
-        response = self.client.post(url, data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        data2 = {
+            "first_name": "New",
+            "last_name": "Doctor",
+            "phone_number": "12345678",
+            "category": "New Category",
+            "member_price": "123.00",
+            "fee": "150.00",
+            "fee_notes": "Not inclusive Western medicine",
+            "language1": "zh",
+            "language2": "en",
+            "availability": [["Monday", "08:00:00", "16:00:00", "weekly"]],
+        }
+        response1 = self.client.post(url, data1, format="json")
+        self.assertEqual(response1.status_code, status.HTTP_201_CREATED)
+
+        response2 = self.client.post(url, data2, format="json")
+        self.assertEqual(response2.status_code, status.HTTP_400_BAD_REQUEST)
+
+        availabilities = Availability.objects.all()
+        new_doctor = Doctor.objects.get(id=response1.data)
+        all_doctor = Doctor.objects.all()
+
+        self.assertEqual(all_doctor.count(), 4)
+        self.assertEqual(availabilities.count(), 2)
+        self.assertEqual(new_doctor.first_name, "New")
+        self.assertEqual(new_doctor.hospital, self.hospital)

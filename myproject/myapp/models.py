@@ -1,21 +1,5 @@
-from enum import Enum
 from django.db import models
 import uuid
-
-
-# class Category(Enum):
-#     CARDIOLOGIST = "cardiologist"
-#     DERMATOLOGIST = "dermatologist"
-#     NEUROLOGIST = "neurologist"
-#     GENERAL_PRACTITIONER = "general_practitioner"
-
-
-# class Languages(Enum):
-#     ENGLISH = "en"
-#     FRENCH = "fr"
-#     SPANISH = "es"
-#     GERMAN = "de"
-#     CHINESE = "zh"
 
 
 class Hospital(models.Model):

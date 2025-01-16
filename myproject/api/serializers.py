@@ -2,12 +2,6 @@ from rest_framework import serializers
 from myapp.models import Doctor, Hospital, Availability
 
 
-class HospitalSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Hospital
-        fields = "__all__"
-
-
 class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
@@ -18,6 +12,22 @@ class AvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Availability
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        include_fields = kwargs.pop("include_fields", None)
+        exclude_fields = kwargs.pop("exclude_fields", None)
+
+        super(AvailabilitySerializer, self).__init__(*args, **kwargs)
+
+        if include_fields is not None:
+            allowed = set(include_fields)
+            existing = set(self.fields.keys())
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
+        if exclude_fields is not None:
+            for field_name in exclude_fields:
+                self.fields.pop(field_name)
 
 
 class CreateDoctorSerializer(serializers.Serializer):
@@ -46,7 +56,6 @@ class CreateDoctorSerializer(serializers.Serializer):
         return value
 
     def validate_availability(self, value):
-        # Check the size of each nested list
         for sublist in value:
             if len(sublist) != 4:
                 raise serializers.ValidationError(
@@ -56,13 +65,13 @@ class CreateDoctorSerializer(serializers.Serializer):
         return value
 
 
-class PriceRangeSerializer(serializers.Serializer):
-    min_price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    max_price = serializers.DecimalField(max_digits=10, decimal_places=2)
-
-
 # class DoctorFilteredSerializer(serializers.Serializer):
 #     district = serializers.CharField(required=False)
 #     category = serializers.CharField(required=False)
 #     price = PriceRangeSerializer(required=False)
 #     language = serializers.CharField(required=False)
+
+# class HospitalSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Hospital
+#         fields = "__all__"
