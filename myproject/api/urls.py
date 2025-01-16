@@ -7,7 +7,3 @@ urlpatterns = [
     path("doctor", views.getDoctorFiltered, name="doctor"),
     path("add-hospital", views.addHospital, name="add_hospital"),
 ]
-
-
-# path("hospital-list", views.getHospitalList, name="hospital_list"),
-# path("hospital/<str:id>", views.getHospital, name="get_hospital"),

@@ -102,6 +102,7 @@ class SerializerTestCase(TestCase):
         self.assertFalse(serializer4.is_valid())
 
     def test_doctor_serializer(self):
+        # Correct data
         data1 = {
             "first_name": "New",
             "last_name": "Doctor",
@@ -114,6 +115,8 @@ class SerializerTestCase(TestCase):
             "language1": "en",
             "language2": None,
         }
+
+        # category parameter is missing
         data2 = {
             "first_name": "New",
             "last_name": "Doctor",
@@ -131,7 +134,7 @@ class SerializerTestCase(TestCase):
         self.assertFalse(serializer2.is_valid())
 
     def test_availability_serializer(self):
-
+        # Correct data
         data1 = {
             "doctor": self.doctor.id,
             "day_of_week": "Monday",
@@ -139,6 +142,8 @@ class SerializerTestCase(TestCase):
             "end_time": "16:00:00",
             "recurrence_pattern": "weekly",
         }
+
+        # start_time is not in the correct format
         data2 = {
             "doctor": self.doctor.id,
             "day_of_week": "Monday",

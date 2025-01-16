@@ -137,29 +137,3 @@ def addHospital(request):
     if serializer.is_valid():
         serializer.save()
     return Response(serializer.data)
-
-
-# @api_view(["GET"])
-# def getHospitalList(request):
-#     hospitals = Hospital.objects.all()
-#     serializer = HospitalSerializer(hospitals, many=True)
-#     return Response(serializer.data)
-
-
-# @api_view(["GET"])
-# def getHospital(request, id):
-
-#     try:
-#         uuid_obj = uuid.UUID(id)
-#     except ValueError:
-#         res = {"error": "Invalid ID format"}
-#         return Response(res, status=400)
-
-#     try:
-#         hospital = Hospital.objects.get(id=id)
-#     except Hospital.DoesNotExist:
-#         res = {"error": "hospital ID does not exist"}
-#         return Response(res, status=400)
-
-#     serializer = HospitalSerializer(hospital)
-#     return Response(serializer.data)

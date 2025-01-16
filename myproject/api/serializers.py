@@ -47,6 +47,7 @@ class CreateDoctorSerializer(serializers.Serializer):
         child=serializers.ListField(child=serializers.CharField()), allow_null=True
     )
 
+    # Also checks if the hospital ID is reistered in the database
     def validate_hospital(self, value):
         if value is not None:
             try:
@@ -55,6 +56,7 @@ class CreateDoctorSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Hospital ID does not exist")
         return value
 
+    # The sublists in availability must have 4 items
     def validate_availability(self, value):
         for sublist in value:
             if len(sublist) != 4:
@@ -69,10 +71,3 @@ class HospitalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hospital
         fields = "__all__"
-
-
-# class DoctorFilteredSerializer(serializers.Serializer):
-#     district = serializers.CharField(required=False)
-#     category = serializers.CharField(required=False)
-#     price = PriceRangeSerializer(required=False)
-#     language = serializers.CharField(required=False)
