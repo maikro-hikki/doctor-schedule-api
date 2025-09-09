@@ -3,7 +3,7 @@ _This is a quick summary of the project along with the required deliverables. Mo
 _With the requirement of the project to be around 8 hours for development, the development aspect of the project was done over 2 days with around 4 hours of development on each day. The third day was used for documentation, such as making the README file._
 
 # Project Description
-This project assignment develops the API to create, store, and retrieve informattion about doctors and their schedules, wwhich could potentially be used for larger projects with application in industries such as healthcare, insurance, etc.
+This project assignment develops the API to create, store, and retrieve information about doctors and their availability, which could potentially be used for larger projects with application in industries such as healthcare, insurance, etc.
 
 # Starting the Server
 The python version used during development is 3.12.3 on Windows 10.
